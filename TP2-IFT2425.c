@@ -333,7 +333,7 @@ float*** fmatrix_allocate_3d(int dsize,int vsize,int hsize)
 }
 
 //----------------------------------------------------------
-// Libere la memoire de la matrice 1d de float              
+// Libere la memoire de la matrice 1d de float
 //----------------------------------------------------------
 void free_fmatrix_1d(float* pmat)
 {
@@ -341,7 +341,7 @@ void free_fmatrix_1d(float* pmat)
 }
 
 //----------------------------------------------------------
-// Libere la memoire de la matrice 2d de float              
+// Libere la memoire de la matrice 2d de float
 //----------------------------------------------------------
 void free_fmatrix_2d(float** pmat)
 {
@@ -362,7 +362,7 @@ void free_fmatrix_3d(float*** pmat,int dsize)
 }
 
 //----------------------------------------------------------
-// Chargement de l'image de nom <name> (en pgm)             
+// Chargement de l'image de nom <name> (en pgm)
 //----------------------------------------------------------
 float** LoadImagePgm(char* name,int *length,int *width)
 {
@@ -406,8 +406,8 @@ float** LoadImagePgm(char* name,int *length,int *width)
 }
 
 //----------------------------------------------------------
-// Sauvegarde de l'image de nom <name> au format pgm                        
-//----------------------------------------------------------                
+// Sauvegarde de l'image de nom <name> au format pgm
+//----------------------------------------------------------
 void SaveImagePgm(char* name,float** mat,int lgth,int wdth)
 {
     int i,j;
@@ -439,8 +439,8 @@ void SaveImagePgm(char* name,float** mat,int lgth,int wdth)
 }
 
 //----------------------------------------------------------
-// Sauvegarde de l'image de nom <name> au format ppm                        
-//----------------------------------------------------------                
+// Sauvegarde de l'image de nom <name> au format ppm
+//----------------------------------------------------------
 void SaveImagePpm(char* name,float** img,float** vct,int lgth,int wdth)
 {
     int i,j;
@@ -482,7 +482,7 @@ void SaveImagePpm(char* name,float** img,float** vct,int lgth,int wdth)
 }
 
 //----------------------------------------------------------
-// DrawLine[Img] (rowbeg,colbeg)-->(rowend,colend)                        
+// DrawLine[Img] (rowbeg,colbeg)-->(rowend,colend)
 //----------------------------------------------------------
 void DrawLine(float** Img,int colbeg,int rowbeg,int colend,int rowend,int wdth,int lgth)
 {
@@ -531,7 +531,7 @@ void DrawLine(float** Img,int colbeg,int rowbeg,int colend,int rowend,int wdth,i
 }
 
 //----------------------------------------------------------
-// PutArrowOnImg                                                   
+// PutArrowOnImg
 //----------------------------------------------------------
 void PutArrowOnImg(float** Img,int lgth,int wdth,int PosX,int PosY,float IncPosX,float IncPosY)
 {
@@ -573,7 +573,7 @@ void PutArrowOnImg(float** Img,int lgth,int wdth,int PosX,int PosY,float IncPosX
 }
 
 //----------------------------------------------------------
-// ConvertVelocityFieldInArrowField                                                   
+// ConvertVelocityFieldInArrowField
 //----------------------------------------------------------
 void ConvertVelocityFieldInArrowField(float** ImgOptFlot,float** Vx,float** Vy,int lgth,int wdth,int INC)
 {
@@ -683,9 +683,9 @@ int main(int argc,char** argv)
     float wi = 0.0;
 
     float** matG;
-    float** matD;
+
     matG = fmatrix_allocate_2d(2,2);
-    matD = fmatrix_allocate_2d(2,2);
+
 
     // init
     for (i = 0; i<2; i++) for(j=0;j<2;j++){
@@ -727,6 +727,67 @@ int main(int argc,char** argv)
                             +img2[i][j+1]-img1[i][j+1] + img2[i+1][j+1]-img1[i+1][j+1]) / 4.0;
             }
         }
+
+
+    for(i=0; i<n;i++) for(j=0; j<n;j++){
+
+        a += Ix[i][j]*Ix[i][j];
+        b += Ix[i][j]*Iy[i][j];
+        c = b ;
+        d += Iy[i][j]*Iy[i][j] ;
+        e += Ix[i][j]*It[i][j];
+        f += Iy[i][j]*It[i][j];
+
+        }
+
+    e = -e; f = -f;
+
+    float divisuer = a*d - b*c;
+
+    if(divisuer != 0){
+        x = (e*d-b*f) / divisuer;
+        y = (a*f-e*c) / divisuer;
+    }
+
+    a=0.0; b=a; c=a; d=a; e=a; f=a;
+    float tmp_e = 0.0, tmp_f = 0.0;
+
+    for(i=0; i<n;i++) for(j=0; j<n;j++){
+
+            wi += Gauss(x-Ix[i][j], y-Iy[i][j]);
+            a += w*Ix[i][j]*Ix[i][j];
+            b += w*Ix[i][j]*Iy[i][j];
+            c = b ;
+            d += w*Iy[i][j]*Iy[i][j] ;
+            e += w*Ix[i][j]*It[i][j];
+            f += w*Iy[i][j]*It[i][j];
+
+            // vecteur de droite
+            tmp_e = -e;
+            tmp_f = -f;
+
+            // calcul de la matrice inverse de (A^T W A)
+            matG[0][0] =  d / divisuer;
+            matG[0][1] = -b / divisuer;
+            matG[1][0] = -c / divisuer;
+            matG[1][1] =  a / divisuer;
+
+
+            OptFl_Vx[i][j] = (matG[0][0]*tmp_e) + (matG[0][1]*tmp_f);
+            OptFl_Vy[i][j] = (matG[1][0]*tmp_e) + (matG[1][0]*tmp_f);
+
+
+            tmp_e = 0.0; tmp_f = 0.0;
+
+
+
+
+        }
+
+
+
+
+
 
 
 
@@ -782,7 +843,7 @@ int main(int argc,char** argv)
     }
 
 
-//--------------- End Graphical Session --------------------     
+//--------------- End Graphical Session --------------------
 //----------------------------------------------------------
 
     //Liberation Memoire
@@ -791,6 +852,7 @@ int main(int argc,char** argv)
     if (Ix)  free_fmatrix_2d(Ix);
     if (Iy)  free_fmatrix_2d(Iy);
     if (It)  free_fmatrix_2d(It);
+    if (matG) free_fmatrix_2d(matG);
 
     //Return
     printf("\n C'est fini... \n");
