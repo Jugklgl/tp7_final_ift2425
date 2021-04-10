@@ -1,12 +1,12 @@
 //------------------------------------------------------
 // module  : Tp2-IFT2425.c
-// author  : 
-// date    : 
+// author  :
+// date    :
 // version : 1.0
 // language: C++
 // note    :
 //------------------------------------------------------
-//  
+//
 
 //------------------------------------------------
 // FICHIERS INCLUS -------------------------------
@@ -609,8 +609,8 @@ int main(int argc,char** argv)
     int   length,width;
     float alpha;
 
-    float** Img1;
-    float** Img2;
+    float** img1;
+    float** img2;
     float** Ix;
     float** Iy;
     float** It;
@@ -639,8 +639,8 @@ int main(int argc,char** argv)
     int zoom=2;
 
     //>Load Images_&_Parametre
-    Img1=LoadImagePgm(argv[1],&length,&width);
-    Img2=LoadImagePgm(argv[2],&length,&width);
+    img1=LoadImagePgm(argv[1],&length,&width);
+    img2=LoadImagePgm(argv[2],&length,&width);
 
     //>Allocation Memoire
     ImgOptFlot=fmatrix_allocate_2d(length,width);
@@ -680,7 +680,8 @@ int main(int argc,char** argv)
     const int n = 1225;
 
     float x=0,y=0,a=0,b=0,c=0,d=0,e=0,f=0;
-    float wi = 0.0;
+    float** wi;
+    wi = fmatrix_allocate_2d(length,width);
 
     float** matG;
 
@@ -690,7 +691,6 @@ int main(int argc,char** argv)
     // init
     for (i = 0; i<2; i++) for(j=0;j<2;j++){
             matG[i][j] = 0.0;
-            matD[i][j] = 0.0;
         }
 
 
@@ -727,6 +727,17 @@ int main(int argc,char** argv)
                             +img2[i][j+1]-img1[i][j+1] + img2[i+1][j+1]-img1[i+1][j+1]) / 4.0;
             }
         }
+
+/*
+    // calcul des wi
+    for(i=0;i<length;i++) for(j=0;j<width;j++){
+
+        wi[i][j] = Gauss()
+
+
+
+    }
+
 
 
     for(i=0; i<n;i++) for(j=0; j<n;j++){
@@ -787,7 +798,7 @@ int main(int argc,char** argv)
 
 
 
-
+*/
 
 
 
@@ -798,7 +809,7 @@ int main(int argc,char** argv)
 
     //Sauvegarde
     printf("\n");
-    SaveImagePpm("Optical_Flot_WithImg",Img2,ImgOptFlot,length,width);
+    SaveImagePpm("Optical_Flot_WithImg",img2,ImgOptFlot,length,width);
     SaveImagePgm("Optical_Flot",ImgOptFlot,length,width);
 
 
@@ -823,10 +834,10 @@ int main(int argc,char** argv)
     {
         printf("\r [%d/200]",k);
         fflush(stdout);
-        if (k%2)       x_ppicture1=cree_Ximage(Img1,zoom,length,width);
-        else           x_ppicture1=cree_Ximage(Img2,zoom,length,width);
+        if (k%2)       x_ppicture1=cree_Ximage(img1,zoom,length,width);
+        else           x_ppicture1=cree_Ximage(img2,zoom,length,width);
         x_ppicture2=cree_Ximage(ImgOptFlot,zoom,length,width);
-        x_ppicture3=cree_XimageWithMvt(Img2,ImgOptFlot,zoom,length,width);
+        x_ppicture3=cree_XimageWithMvt(img2,ImgOptFlot,zoom,length,width);
 
         XPutImage(display,win_ppicture1,gc,x_ppicture1,0,0,0,0,
                   x_ppicture1->width,x_ppicture1->height);
@@ -853,6 +864,7 @@ int main(int argc,char** argv)
     if (Iy)  free_fmatrix_2d(Iy);
     if (It)  free_fmatrix_2d(It);
     if (matG) free_fmatrix_2d(matG);
+    if (wi) free_fmatrix_2d(wi);
 
     //Return
     printf("\n C'est fini... \n");
