@@ -680,10 +680,10 @@ int main(int argc,char** argv)
     const int n = 1225;
 
     float x=0,y=0,a=0,b=0,c=0,d=0,e=0,f=0;
-    float** wi;
-    wi = fmatrix_allocate_2d(length,width);
+    float* wi;
+    wi = fmatrix_allocate_1d(length);
 
-    float** matG;
+    float* matG;
 
     matG = fmatrix_allocate_2d(2,2);
 
@@ -728,54 +728,34 @@ int main(int argc,char** argv)
             }
         }
 
-/*
+
     // calcul des wi
     for(i=0;i<length;i++) for(j=0;j<width;j++){
 
-        wi[i][j] = Gauss()
-
-
-
-    }
-
-
-
-    for(i=0; i<n;i++) for(j=0; j<n;j++){
-
-        a += Ix[i][j]*Ix[i][j];
-        b += Ix[i][j]*Iy[i][j];
-        c = b ;
-        d += Iy[i][j]*Iy[i][j] ;
-        e += Ix[i][j]*It[i][j];
-        f += Iy[i][j]*It[i][j];
+            wi[i] = Gauss(Ix[i][j], Iy[i][j]);
 
         }
 
-    e = -e; f = -f;
 
-    float divisuer = a*d - b*c;
-
-    if(divisuer != 0){
-        x = (e*d-b*f) / divisuer;
-        y = (a*f-e*c) / divisuer;
-    }
-
-    a=0.0; b=a; c=a; d=a; e=a; f=a;
+    float divisuer;
     float tmp_e = 0.0, tmp_f = 0.0;
 
     for(i=0; i<n;i++) for(j=0; j<n;j++){
 
-            wi += Gauss(x-Ix[i][j], y-Iy[i][j]);
-            a += w*Ix[i][j]*Ix[i][j];
-            b += w*Ix[i][j]*Iy[i][j];
+
+            a += wi[i]*Ix[i][j]*Ix[i][j];
+            b += wi[i]*Ix[i][j]*Iy[i][j];
             c = b ;
-            d += w*Iy[i][j]*Iy[i][j] ;
-            e += w*Ix[i][j]*It[i][j];
-            f += w*Iy[i][j]*It[i][j];
+            d += wi[i]*Iy[i][j]*Iy[i][j] ;
+            e += wi[i]*Ix[i][j]*It[i][j];
+            f += wi[i]*Iy[i][j]*It[i][j];
+
 
             // vecteur de droite
             tmp_e = -e;
             tmp_f = -f;
+
+            divisuer = a*d - b*c;
 
             // calcul de la matrice inverse de (A^T W A)
             matG[0][0] =  d / divisuer;
@@ -783,12 +763,12 @@ int main(int argc,char** argv)
             matG[1][0] = -c / divisuer;
             matG[1][1] =  a / divisuer;
 
+            for(i=5;i<length-5;i++) for(j=5;j<width-5;j++){
+                    OptFl_Vx[i][j] = (matG[0][0]*tmp_e) + (matG[0][1]*tmp_f);
+                    OptFl_Vy[i][j] = (matG[1][0]*tmp_e) + (matG[1][0]*tmp_f);
+                }
 
-            OptFl_Vx[i][j] = (matG[0][0]*tmp_e) + (matG[0][1]*tmp_f);
-            OptFl_Vy[i][j] = (matG[1][0]*tmp_e) + (matG[1][0]*tmp_f);
 
-
-            tmp_e = 0.0; tmp_f = 0.0;
 
 
 
@@ -798,7 +778,7 @@ int main(int argc,char** argv)
 
 
 
-*/
+
 
 
 
